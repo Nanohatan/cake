@@ -1,0 +1,11 @@
+{{ define "main" }}
+<div class="container">
+ 
+    {{ range .Site.Data.cakeWords }}
+
+        {{ partial "my/birthday_output.html" . }}
+
+    {{ end }}
+
+</div>
+{{ end }}

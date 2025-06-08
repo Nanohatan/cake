@@ -2,9 +2,9 @@
 # Hugo ビルド成果物
 # =========================
 public
-/resources/_gen/         # 生成されたリソース
-/hugo_stats.json         # ビルド統計ファイル
-/.hugo_build.lock        # ビルドロックファイル
+/resources/_gen/
+/hugo_stats.json
+/.hugo_build.lock
 
 # =========================
 # OS・エディタ固有ファイル

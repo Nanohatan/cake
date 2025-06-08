@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode }}">
+<head>
+
+    <title>{{ .Site.Title }}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Yomogi&display=swap" rel="stylesheet">
+
+    {{ partial "head/metadata.html" . }}
+
+
+    <!-- フォークカーソルのためのスタイル -->
+    {{ $fork := resources.Get "images/fork-32.png" }}
+    {{ if $fork }}
+    <style>
+        body, a, button {
+            cursor: url('{{ $fork.RelPermalink }}') 10 10, pointer;
+        }
+    </style>
+    {{ end }}
+</head>
+<body>
+    
+    {{ partial "header/site-header.html" . }}
+
+
+    <div class="container">
+        {{ block "main" . }}{{ end }}
+    </div>
+
+    <!-- HugoのデータをJavaScriptに渡す -->
+    <script>
+        const cakeWordsData = {{ site.Data.cakeWords | jsonify | safeJS}};
+    </script>
+    
+    <!-- JavaScriptファイルを読み込む -->
+    {{ $mainJS := resources.Get "js/main.js" }}
+    <script src="{{ $mainJS.RelPermalink }}"></script>
+</body>
+</html>

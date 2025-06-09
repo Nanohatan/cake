@@ -1,0 +1,227 @@
+
+
+<div class="input-area">
+    <label for="birthday">Birthday:</label>
+    <!-- 実際の選択値を受け取るための隠しinput（フォーム送信時に使用） -->
+    <input type="date" id="birthday" name="birthday">
+
+    <!-- カスタムカレンダーを開くための入力フィールド（見た目用） -->
+    <div class="custom-date-input" id="customBirthdayInput">
+        <span id="selectedDateText">日付を選択してください</span>
+        <i class="calendar-icon">📅</i>
+    </div>
+
+    <!-- カレンダー本体のコンテナ -->
+    <div class="calendar-container" id="calendarContainer">
+        <div class="calendar-header">
+            <button class="prev-month" aria-label="前の月へ">
+                << /button>
+                    <div class="current-month-year">
+                        <!-- 年表示を削除しました。月のみ表示されます。 -->
+                        <span id="currentMonthDisplay"></span>
+                    </div>
+                    <button class="next-month" aria-label="次の月へ">></button>
+        </div>
+        <div class="calendar-weekdays" id="calendarWeekdays"></div>
+        <div class="calendar-dates" id="calendarDates"></div>
+    </div>
+</div>
+
+<button id="submitButton">日付を送信</button>
+
+<div class="result-area" id="resultArea">
+    <h2>選択された日付:</h2>
+    <p class="cake-word" id="displaySelectedDate">日付がまだ選択されていません</p>
+</div>
+
+<script>
+    // DOM要素の取得
+    const birthdayInput = document.getElementById('birthday'); // 隠しinput
+    const customBirthdayInput = document.getElementById('customBirthdayInput'); // カスタムUIの入力フィールド
+    const selectedDateText = document.getElementById('selectedDateText'); // 選択された日付を表示するテキスト
+    const calendarContainer = document.getElementById('calendarContainer'); // カレンダー全体
+    const prevMonthBtn = document.querySelector('.prev-month');
+    const nextMonthBtn = document.querySelector('.next-month');
+    const currentMonthDisplay = document.getElementById('currentMonthDisplay');
+    // const currentYearDisplay = document.getElementById('currentYearDisplay'); // 年表示を削除したので、この行は不要
+    const calendarWeekdays = document.getElementById('calendarWeekdays');
+    const calendarDates = document.getElementById('calendarDates');
+    const submitButton = document.getElementById('submitButton');
+    const resultArea = document.getElementById('resultArea');
+    const displaySelectedDate = document.getElementById('displaySelectedDate');
+
+    // カレンダーの状態変数
+    let currentDate = new Date(); // 現在表示しているカレンダーの基準日
+    let currentYear = currentDate.getFullYear();
+    let currentMonth = currentDate.getMonth(); // 0-indexed (0:1月, 11:12月)
+    let selectedDate = null; // ユーザーが選択した日付 (Dateオブジェクト)
+
+    // 月名と曜日名（日本語）
+    const monthNames = [
+        "1月", "2月", "3月", "4月", "5月", "6月",
+        "7月", "8月", "9月", "10月", "11月", "12月"
+    ];
+    const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
+
+    /**
+     * 曜日ヘッダーをレンダリングする関数
+     */
+    function renderWeekdays() {
+        calendarWeekdays.innerHTML = ''; // 既存の曜日をクリア
+        dayNames.forEach(day => {
+            const cell = document.createElement('div');
+            cell.classList.add('calendar-weekday-cell');
+            cell.textContent = day;
+            calendarWeekdays.appendChild(cell);
+        });
+    }
+
+    /**
+     * カレンダーの日付部分をレンダリングする関数
+     */
+    function renderCalendar() {
+        calendarDates.innerHTML = ''; // 既存の日付をクリア
+
+        // 現在の月のみ表示 (年表示は不要)
+        currentMonthDisplay.textContent = monthNames[currentMonth];
+
+        // 今月の1日の曜日 (0:日曜日, ..., 6:土曜日)
+        const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+        // 今月の日数
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+        // 前月の日付のための空セル（グリッドの配置調整）
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('calendar-date-cell', 'empty', 'prev-month');
+            calendarDates.appendChild(cell);
+        }
+
+        // 今月の日付セルを生成
+        for (let day = 1; day <= daysInMonth; day++) {
+            const cell = document.createElement('div');
+            cell.classList.add('calendar-date-cell');
+            cell.textContent = day;
+
+            const today = new Date(); // 今日の日付
+            // 今日の日付であれば 'today' クラスを追加 (内部の年情報で比較を維持)
+            if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+                cell.classList.add('today');
+            }
+
+            // 選択されている日付であれば 'selected' クラスを追加 (内部の年情報で比較を維持)
+            if (selectedDate &&
+                day === selectedDate.getDate() &&
+                currentMonth === selectedDate.getMonth() &&
+                currentYear === selectedDate.getFullYear()) {
+                cell.classList.add('selected');
+            }
+
+            // 各日付セルにクリックイベントを追加
+            cell.addEventListener('click', () => {
+                // 以前に選択された日付があれば、その 'selected' クラスを削除
+                const previouslySelected = calendarDates.querySelector('.selected');
+                if (previouslySelected) {
+                    previouslySelected.classList.remove('selected');
+                }
+
+                // クリックされた日付に 'selected' クラスを追加
+                cell.classList.add('selected');
+
+                // 選択された日付を更新 (内部的には年も含む完全な日付オブジェクトを保持)
+                selectedDate = new Date(currentYear, currentMonth, day);
+                // 表示テキストは月と日のみ
+                const formattedDateText = `${selectedDate.getMonth() + 1}月${selectedDate.getDate()}日`;
+                selectedDateText.textContent = formattedDateText;
+
+                // 隠しinput[type="date"]の値を設定 (YYYY-MM-DD形式) - ここでは年を送信するために必要
+                const year = selectedDate.getFullYear();
+                const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+                const date = selectedDate.getDate().toString().padStart(2, '0');
+                birthdayInput.value = `${year}-${month}-${date}`;
+
+                toggleCalendar(false); // 日付選択後、カレンダーを閉じる
+            });
+            calendarDates.appendChild(cell);
+        }
+
+        // 次月の日付のための空セル（グリッドの配置調整、最大6週表示を想定）
+        const totalCells = firstDayOfMonth + daysInMonth;
+        const remainingCells = 42 - totalCells; // 6週 * 7日 = 42セルが最大のグリッド
+        for (let i = 1; i <= remainingCells; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('calendar-date-cell', 'empty', 'next-month');
+            calendarDates.appendChild(cell);
+        }
+    }
+
+    /**
+     * カレンダーの表示/非表示を切り替える関数
+     * @param {boolean} [forceShow=undefined] - trueなら表示、falseなら非表示、undefinedならトグル
+     */
+    function toggleCalendar(forceShow = undefined) {
+        if (forceShow === true) {
+            calendarContainer.classList.add('show');
+        } else if (forceShow === false) {
+            calendarContainer.classList.remove('show');
+        } else {
+            calendarContainer.classList.toggle('show');
+        }
+    }
+
+    // カスタム入力フィールドクリックでカレンダーを表示/非表示
+    customBirthdayInput.addEventListener('click', (event) => {
+        event.stopPropagation(); // documentクリックイベントへの伝播を防ぐ
+        toggleCalendar();
+    });
+
+    // 「前の月へ」ボタンのクリックイベント
+    prevMonthBtn.addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11; // 12月へ
+            currentYear--;     // 年を減らす (内部的には年を更新)
+        }
+        renderCalendar();
+    });
+
+    // 「次の月へ」ボタンのクリックイベント
+    nextMonthBtn.addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;  // 1月へ
+            currentYear++;     // 年を増やす (内部的には年を更新)
+        }
+        renderCalendar();
+    });
+
+    // カレンダー外をクリックしたらカレンダーを閉じる
+    document.addEventListener('click', (event) => {
+        // クリックされた要素がカレンダーコンテナ内にも、カスタム入力フィールド内にも含まれない場合
+        if (!calendarContainer.contains(event.target) && !customBirthdayInput.contains(event.target)) {
+            toggleCalendar(false); // カレンダーを閉じる
+        }
+    });
+
+    // カレンダー内をクリックしても閉じないようにする（伝播停止）
+    calendarContainer.addEventListener('click', (event) => {
+        event.stopPropagation();
+    });
+
+    // 「日付を送信」ボタンの機能
+    submitButton.addEventListener('click', () => {
+        if (selectedDate) {
+            // 結果表示エリアでも月と日だけを表示
+            const formattedDate = `${selectedDate.getMonth() + 1}月${selectedDate.getDate()}日`;
+            displaySelectedDate.textContent = formattedDate;
+            resultArea.classList.add('show'); // 結果表示エリアを表示
+        } else {
+            displaySelectedDate.textContent = '日付が選択されていません。';
+            resultArea.classList.remove('show'); // 日付が選択されていなければ非表示
+        }
+    });
+
+    // ページの読み込み時に初回レンダリング
+    renderWeekdays(); // 曜日ヘッダーのレンダリング
+    renderCalendar(); // カレンダー日付のレンダリング
+</script>

@@ -11,6 +11,7 @@
 
     {{ partial "head/metadata.html" . }}
 
+    
 
     <!-- フォークカーソルのためのスタイル -->
     {{ $fork := resources.Get "images/fork-32.png" }}
@@ -21,8 +22,31 @@
         }
     </style>
     {{ end }}
+    {{ $flower := resources.Get "images/flower-128.png" }}
+
+    <style>
+        /* １．疑似要素で背景レイヤーを作成 */
+    body::before {
+    content: "";
+    position: fixed;        /* ページ全体にフィット */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;            /* コンテンツの背後に配置 */
+
+    /* 繰り返し背景画像 */
+    background-image: url('{{ $flower.RelPermalink }}');
+    background-color: rgba(255,255,255,0.6);
+    background-blend-mode: lighten;
+    background-repeat: repeat;
+    background-position: center center;
+
+
+
+    </style>
 </head>
-<body>
+<body style="background-color: #fff9ff;">
     
     {{ partial "header/site-header.html" . }}
 

@@ -12,4 +12,3 @@ URL="https://docs.google.com/spreadsheets/d/${_SHEET_ID}/export?format=csv&gid=$
 curl -sL "${URL}" > sheet.csv
 python3 convert.py > data/cakeWords.json
 
-zsh 

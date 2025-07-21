@@ -1,7 +1,7 @@
 {{ define "main" }}
 <div class="container">
  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-    {{ range .Site.Data.cakeWords }}
+    {{ range sort .Site.Data.cakeWords "month" "day"  }}
 
         {{ partial "my/card_cake.html" . }}
 

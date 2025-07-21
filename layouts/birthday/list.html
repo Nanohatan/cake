@@ -76,7 +76,7 @@
         font-size: 1.2em;
     }
 
-    button {
+    .c_button {
         padding: 12px 25px;
         background-color: #ff8fab; /* ピンク */
         color: white;
@@ -90,7 +90,7 @@
         cursor: pointer;
     }
 
-    button:hover {
+    .c_button:hover {
         background-color: #fb6f92;
         transform: scale(1.05);
     }
@@ -113,7 +113,7 @@
         visibility: visible;
     }
 
-    .result-area h2 {
+    .result-area {
         color: #d47d9c;
         margin-top: 0;
         font-size: 1.5em;
@@ -127,11 +127,6 @@
         font-family: 'Mochiy Pop One', sans-serif;
     }
 
-    footer {
-        margin-top: 30px;
-        font-size: 0.8em;
-        color: #e8a0bf;
-    }
 
     /* --- Custom Calendar Styles --- */
     .calendar-container {
@@ -171,7 +166,7 @@
         font-size: 1.2em;
     }
 
-    .calendar-header button {
+    .calendar-header .c_button {
         background-color: #ffb6c1; /* ライトピンク */
         color: #fff;
         border: none;
@@ -188,11 +183,11 @@
         margin: 0; /* buttonの既存marginをリセット */
         padding: 0; /* buttonの既存paddingをリセット */
     }
-    .calendar-header button:hover {
+    .calendar-header .c_button:hover {
         background-color: #fb6f92;
         transform: scale(1.1);
     }
-    .calendar-header button:active {
+    .calendar-header .c_button:active {
         transform: scale(0.95);
     }
 
@@ -271,11 +266,9 @@
 </style>
 
 
-
-
     <div class="container">
         <h1>Welcome!</h1>
-        <p class="subtitle">お誕生日を選らんでね</p>
+        <p class="subtitle">お誕生日を選んでね</p>
 
         <div class="input-area">
             <label for="birthday"></label>
@@ -303,7 +296,7 @@
             </div>
         </div>
 
-        <button id="submitButton">日付を送信</button>
+        <button class="c_button" id="submitButton">日付を送信</button>
 
         <div class="result-area" id="resultArea">
             <h2>選択された日付:</h2>
@@ -416,7 +409,10 @@
                     const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
                     const date = selectedDate.getDate().toString().padStart(2, '0');
                     birthdayInput.value = `${year}-${month}-${date}`;
-
+                    const resultData = cakeWordsData.find(item =>
+                        item.month === parseInt(selectedDate.getMonth() + 1, 10) &&
+                        item.day   === parseInt(selectedDate.getDate())
+                    );
                     toggleCalendar(false); // 日付選択後、カレンダーを閉じる
                 });
                 calendarDates.appendChild(cell);

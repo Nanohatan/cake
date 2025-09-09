@@ -2,46 +2,81 @@
 
 
 <div class="container">
-    <div class="card my-5" style="border: 3px dashed #ffb6c1;">
-        <div class="card-body">
-            {{ $now   := now }}
-            {{ $month := $now.Month | int }}
-            {{ $day   := $now.Day }}
-            {{ $all := .Site.Data.cakeWords }}
-            {{ $byMonth := where $all "month" $month }}
-            {{ $today   := where $byMonth "day"   $day | first 1 }}
-            <h2 style="font-family: 'Mochiy Pop One', sans-serif; color: #d47d9c;">{{$month}}/{{$day}}☆今日のケーキ言葉</h2>
+  <div class="card my-5" style="border: 3px dashed #ffb6c1;">
+    <div class="card-body">
+      <h2 id="today-title" style="font-family: 'Mochiy Pop One', sans-serif; color: #d47d9c;"></h2>
 
-            {{ with index $today 0 }}
-            <article class="today-cake">
-                <h3>{{ .cakeName }}</h3>
-                <h4>『{{ .cakeWord }}』</h4>
-                <div class="description">
-                {{ .description | markdownify }}
-                </div>
-            </article>
-            {{ else }}
-            <p>本日（{{ $month }}月{{ $day }}日）のデータはありません。</p>
-            {{ end }}
-            
-        </div>
+      <article id="today-cake" class="today-cake" hidden>
+        <h3 id="cake-name"></h3>
+        <h4 id="cake-word"></h4>
+        <div id="cake-desc" class="description"></div>
+      </article>
+
+      <p id="no-data" hidden></p>
     </div>
-    <div class="card my-5" style="border: 3px dashed #ffb6c1;">
-        <div class="card-body">
-            <h2 style="font-family: 'Mochiy Pop One', sans-serif; color: #d47d9c;">あなたの誕生日から、<br>特別なケーキ言葉を見つけよう</h2>
+  </div>
 
-        {{ partial "my/birthday_input.html" . }}
-
-        </div>
+  <div class="card my-5" style="border: 3px dashed #ffb6c1;">
+    <div class="card-body">
+      <h2 style="font-family: 'Mochiy Pop One', sans-serif; color: #d47d9c;">
+        あなたの誕生日から、<br>特別なケーキ言葉を見つけよう
+      </h2>
+      <!-- 既存の入力パーシャルはそのまま -->
+      {{ partial "my/birthday_input.html" . }}
     </div>
+  </div>
 
-    <div id="result-area" class="card my-5 result-area" style="border: 3px dashed #ffb6c1;">
-        <div class="card-body">
-            <h2 style="font-family: 'Mochiy Pop One', sans-serif; color: #d47d9c;"></h2>
-        </div>
+  <div id="result-area" class="card my-5 result-area" style="border: 3px dashed #ffb6c1;">
+    <div class="card-body">
+      <h2 style="font-family: 'Mochiy Pop One', sans-serif; color: #d47d9c;"></h2>
     </div>
-
+  </div>
 </div>
+
+<script>
+(function () {
+  // 今日の月・日
+  const now = new Date();
+  const month = now.getMonth() + 1; // 1-12
+  const day   = now.getDate();      // 1-31
+
+  // タイトル設定
+  const titleEl = document.getElementById('today-title');
+  titleEl.textContent = `${month}/${day}☆今日のケーキ言葉`;
+
+
+  // 当日分を抽出（最初の1件）
+  const today = cakeWordsData.find(item => Number(item.month) === month && Number(item.day) === day);
+
+  const articleEl = document.getElementById('today-cake');
+  const nameEl    = document.getElementById('cake-name');
+  const wordEl    = document.getElementById('cake-word');
+  const descEl    = document.getElementById('cake-desc');
+  const noDataEl  = document.getElementById('no-data');
+
+  if (today) {
+    nameEl.textContent = today.cakeName || '';
+    wordEl.textContent = today.cakeWord ? `『${today.cakeWord}』` : '';
+
+    // descriptionHtml があれば優先（既に安全な HTML として生成済みを想定）
+    if (today.descriptionHtml) {
+      descEl.innerHTML = today.descriptionHtml;
+    } else if (today.description) {
+      // プレーンテキストとして描画（Markdown の場合は事前に HTML 化した値を descriptionHtml として用意）
+      descEl.textContent = today.description;
+    } else {
+      descEl.textContent = '';
+    }
+
+    articleEl.hidden = false;
+    noDataEl.hidden = true;
+  } else {
+    noDataEl.textContent = `本日（${month}月${day}日）のデータはありません。`;
+    noDataEl.hidden = false;
+    articleEl.hidden = true;
+  }
+})();
+</script>
 
 <footer>
     <p>© 2025 あなたのケーキ言葉占い</p>

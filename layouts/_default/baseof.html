@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ .Site.LanguageCode }}">
 <head>
-
-    <title>{{ .Site.Title }}</title>
+    {{ partial "seo.html" . }}
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,15 +47,15 @@
     
     {{ partial "header/site-header.html" . }}
 
-
-    <div class="container">
-        {{ block "main" . }}{{ end }}
-    </div>
-
     <!-- HugoのデータをJavaScriptに渡す -->
     <script>
         const cakeWordsData = {{ site.Data.cakeWords | jsonify | safeJS}};
     </script>
+    <div class="container">
+        {{ block "main" . }}{{ end }}
+    </div>
+
+
     
     <!-- JavaScriptファイルを読み込む -->
     {{ $mainJS := resources.Get "js/main.js" }}

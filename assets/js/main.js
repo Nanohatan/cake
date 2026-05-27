@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkButton = document.getElementById('checkButton');
     const resultArea = document.getElementById('result-area');
 
+    if (!monthSelect || !daySelect || !checkButton || !resultArea) {
+        return;
+    }
+
     // --- 月と日の選択肢を生成する処理 ---
     
     // 月の選択肢（1〜12月）を生成

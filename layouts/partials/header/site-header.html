@@ -1,31 +1,49 @@
-<style>
-    .navbar {
-    font-family: 'Yomogi', cursive;
-    background-color: #fff0f5;
-    }   
-    .card {
-    background-color: #fff0f5;
-    color: #5c3b32;
-}
+	<style>
+	    .navbar {
+	    font-family: 'Yomogi', cursive;
+	    background-color: #fff0f5;
+	    }   
+	    .navbar-brand {
+	    align-items: center;
+	    display: inline-flex;
+	    gap: 10px;
+	    }
+	    .navbar-brand h2 {
+	    margin-bottom: 0;
+	    }
+	    .site-title-cake {
+	    height: 48px;
+	    width: auto;
+	    }
+	    .card {
+	    background-color: #fff0f5;
+	    color: #5c3b32;
+	}
     
 </style>
 
-<nav class="navbar navbar-expand-lg">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{{ "/" | relURL }}"><h2>{{ .Site.Title }}</h2></a>
+	<nav class="navbar navbar-expand-lg">
+	  <div class="container-fluid">
+	    {{ $rainbowCake := resources.Get "images/reinbow_cake.png" }}
+	    <a class="navbar-brand" href="{{ "/" | relURL }}">
+	      <h2>{{ .Site.Title }}</h2>
+	      {{ with $rainbowCake }}
+	        <img class="site-title-cake" src="{{ .RelPermalink }}" alt="">
+	      {{ end }}
+	    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <a class="nav-link {{ if eq .Page.Section "birthday" }}active text-decoration-underline{{ end }}"  aria-current="page" href="{{ "/birthday" | relURL }}">誕生日から探す</a>
-        </li>
+        </li> -->
         <li class="nav-item">
           <a
             class="nav-link {{ if eq .Page.Section "cakes" }}active text-decoration-underline{{ end }}"
             href="{{ "cakes/" | relURL }}"
-            >ケーキから探す</a>
+            >ケーキ一覧</a>
         </li>
       </ul>
       <form class="d-flex" role="search">

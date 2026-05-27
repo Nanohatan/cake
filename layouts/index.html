@@ -16,22 +16,263 @@
     </div>
   </div>
 
-  <div class="card my-5" style="border: 3px dashed #ffb6c1;">
-    <div class="card-body">
-      <h2 style="font-family: 'Mochiy Pop One', sans-serif; color: #d47d9c;">
-        あなたの誕生日から、<br>特別なケーキ言葉を見つけよう
-      </h2>
-      <!-- 既存の入力パーシャルはそのまま -->
-      {{ partial "my/birthday_input.html" . }}
-    </div>
-  </div>
+	<div class="card my-5" style="border: 3px dashed #ffb6c1;">
+	  <div class="card-body">
+	    <h2 style="font-family: 'Mochiy Pop One', sans-serif; color: #d47d9c;">
+	      あなたの誕生日から、<br>特別なケーキ言葉を見つけよう
+	    </h2>
+	    <div class="top-fortune-layout">
+	      <div class="top-calendar-area">
+	        <input type="date" id="topBirthday" name="topBirthday" hidden>
+	        <p class="selected-date-text" id="topSelectedDateText"></p>
 
-  <div id="result-area" class="card my-5 result-area" style="border: 3px dashed #ffb6c1;">
-    <div class="card-body">
-      <h2 style="font-family: 'Mochiy Pop One', sans-serif; color: #d47d9c;"></h2>
-    </div>
-  </div>
+	        <div class="calendar-container show" id="topCalendarContainer">
+	          <div class="calendar-header">
+	            <button type="button" class="top-prev-month" aria-label="前の月へ">&lt;</button>
+	            <div class="current-month-year">
+	              <span id="topCurrentMonthDisplay"></span>
+	            </div>
+	            <button type="button" class="top-next-month" aria-label="次の月へ">&gt;</button>
+	          </div>
+	          <div class="calendar-weekdays" id="topCalendarWeekdays"></div>
+	          <div class="calendar-dates" id="topCalendarDates"></div>
+	        </div>
+
+	        <button class="c_button" id="topSubmitButton" type="button">占う</button>
+	      </div>
+
+	      <div id="result-area" class="top-result-area">
+	        <p class="result-placeholder">日付を選んで「占う」を押してね</p>
+	      </div>
+	    </div>
+	  </div>
+	</div>
 </div>
+
+<style>
+  .top-fortune-layout {
+    display: grid;
+    gap: 24px;
+  }
+
+  .top-calendar-area {
+    display: block;
+    margin: 20px 0;
+  }
+
+  .selected-date-text {
+    color: #d47d9c;
+    font-family: 'Mochiy Pop One', sans-serif;
+    margin-bottom: 12px;
+  }
+
+  .c_button {
+    background-color: #ff8fab;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Mochiy Pop One', sans-serif;
+    font-size: 1em;
+    margin-left: 10px;
+    padding: 12px 25px;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+
+  .c_button:hover,
+  .c_button:focus {
+    background-color: #fb6f92;
+    transform: scale(1.05);
+  }
+
+  .calendar-container {
+    background-color: #ffffff;
+    border: 3px dashed #ffb6c1;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(212, 125, 156, 0.3);
+    box-sizing: border-box;
+    display: block;
+    margin: 0 auto;
+    opacity: 1;
+    padding: 20px;
+    pointer-events: auto;
+    position: static;
+    width: 300px;
+  }
+
+  .calendar-header {
+    align-items: center;
+    color: #d47d9c;
+    display: flex;
+    font-family: 'Mochiy Pop One', sans-serif;
+    font-size: 1.2em;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .calendar-header button {
+    align-items: center;
+    background-color: #ffb6c1;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    height: 30px;
+    justify-content: center;
+    padding: 0;
+    transition: background-color 0.2s, transform 0.2s;
+    width: 30px;
+  }
+
+  .calendar-header button:hover,
+  .calendar-header button:focus {
+    background-color: #fb6f92;
+    transform: scale(1.1);
+  }
+
+  .calendar-weekdays,
+  .calendar-dates {
+    display: grid;
+    gap: 5px;
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  .calendar-weekdays {
+    color: #e8a0bf;
+    font-family: 'Mochiy Pop One', sans-serif;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+  }
+
+  .calendar-weekday-cell,
+  .calendar-date-cell {
+    text-align: center;
+  }
+
+  .calendar-date-cell {
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    color: #5c3b32;
+    cursor: pointer;
+    font-family: 'Yomogi', cursive;
+    padding: 8px 0;
+    transition: background-color 0.2s, color 0.2s, transform 0.1s;
+  }
+
+  .calendar-date-cell:not(.empty):hover,
+  .calendar-date-cell:not(.empty):focus {
+    background-color: #ffe4e1;
+    transform: scale(1.05);
+  }
+
+  .calendar-date-cell.today {
+    background-color: #ffe4e1;
+    border-color: #ffb6c1;
+    font-weight: bold;
+  }
+
+  .calendar-date-cell.selected {
+    background-color: #ff8fab;
+    border-color: #ff8fab;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    color: #fff;
+    font-weight: bold;
+    transform: scale(1.1);
+  }
+
+  .calendar-date-cell.empty {
+    cursor: default;
+  }
+
+	  .top-result-area {
+	    background-color: #fff8fa;
+	    border: 3px dashed #ffb6c1;
+	    border-radius: 15px;
+	    color: #5c3b32;
+	    display: flex;
+	    flex-direction: column;
+	    justify-content: center;
+	    min-height: 180px;
+	    padding: 24px;
+	    text-align: left;
+  }
+
+  .top-result-area h2 {
+    color: #d47d9c;
+    font-family: 'Mochiy Pop One', sans-serif;
+  }
+
+  .top-result-area .cake-word {
+    color: #ff69b4;
+    font-family: 'Mochiy Pop One', sans-serif;
+    font-size: 1.5rem;
+  }
+
+  .result-placeholder {
+    margin: 0;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .top-fortune-layout {
+      align-items: stretch;
+      grid-template-columns: minmax(420px, 520px) minmax(280px, 1fr);
+      text-align: left;
+    }
+
+    .top-calendar-area {
+      margin: 28px 0;
+      max-width: 520px;
+      text-align: center;
+    }
+
+    .selected-date-text {
+      font-size: 1.25rem;
+    }
+
+    .calendar-container {
+      padding: 28px;
+      width: min(100%, 520px);
+    }
+
+    .calendar-header {
+      font-size: 1.45rem;
+      margin-bottom: 24px;
+    }
+
+    .calendar-header button {
+      height: 40px;
+      width: 40px;
+    }
+
+    .calendar-weekdays,
+    .calendar-dates {
+      gap: 8px;
+    }
+
+    .calendar-weekdays {
+      font-size: 1rem;
+    }
+
+    .calendar-date-cell {
+      aspect-ratio: 1;
+      align-items: center;
+      display: flex;
+      font-size: 1.1rem;
+      justify-content: center;
+      padding: 0;
+    }
+
+	    .top-result-area {
+	      align-self: center;
+	      min-height: 420px;
+	    }
+  }
+</style>
 
 <script>
 (function () {
@@ -75,6 +316,154 @@
     noDataEl.hidden = false;
     articleEl.hidden = true;
   }
+})();
+</script>
+
+<script>
+(function () {
+  const birthdayInput = document.getElementById('topBirthday');
+  const selectedDateText = document.getElementById('topSelectedDateText');
+  const calendarContainer = document.getElementById('topCalendarContainer');
+  const prevMonthBtn = document.querySelector('.top-prev-month');
+  const nextMonthBtn = document.querySelector('.top-next-month');
+  const currentMonthDisplay = document.getElementById('topCurrentMonthDisplay');
+  const calendarWeekdays = document.getElementById('topCalendarWeekdays');
+  const calendarDates = document.getElementById('topCalendarDates');
+  const submitButton = document.getElementById('topSubmitButton');
+  const resultArea = document.getElementById('result-area');
+
+  if (!birthdayInput || !selectedDateText || !calendarContainer || !resultArea) {
+    return;
+  }
+
+  const monthNames = [
+    '1月', '2月', '3月', '4月', '5月', '6月',
+    '7月', '8月', '9月', '10月', '11月', '12月'
+  ];
+  const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+
+  const today = new Date();
+  let currentYear = today.getFullYear();
+  let currentMonth = today.getMonth();
+  let selectedDate = new Date(currentYear, currentMonth, today.getDate());
+
+  function formatDateText(date) {
+    return `${date.getMonth() + 1}月${date.getDate()}日`;
+  }
+
+  function updateInputValue() {
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+
+    birthdayInput.value = `${year}-${month}-${day}`;
+    selectedDateText.textContent = formatDateText(selectedDate);
+  }
+
+  function renderWeekdays() {
+    calendarWeekdays.innerHTML = '';
+    dayNames.forEach(dayName => {
+      const cell = document.createElement('div');
+      cell.classList.add('calendar-weekday-cell');
+      cell.textContent = dayName;
+      calendarWeekdays.appendChild(cell);
+    });
+  }
+
+  function selectDate(day) {
+    selectedDate = new Date(currentYear, currentMonth, day);
+    updateInputValue();
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    calendarDates.innerHTML = '';
+    currentMonthDisplay.textContent = monthNames[currentMonth];
+
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('calendar-date-cell', 'empty');
+      calendarDates.appendChild(cell);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      cell.classList.add('calendar-date-cell');
+      cell.textContent = day;
+
+      if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+        cell.classList.add('today');
+      }
+
+      if (
+        day === selectedDate.getDate() &&
+        currentMonth === selectedDate.getMonth() &&
+        currentYear === selectedDate.getFullYear()
+      ) {
+        cell.classList.add('selected');
+      }
+
+      cell.addEventListener('click', () => selectDate(day));
+      calendarDates.appendChild(cell);
+    }
+
+    const totalCells = firstDayOfMonth + daysInMonth;
+    const remainingCells = 42 - totalCells;
+    for (let i = 0; i < remainingCells; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('calendar-date-cell', 'empty');
+      calendarDates.appendChild(cell);
+    }
+  }
+
+  function showResult() {
+    const birthMonth = selectedDate.getMonth() + 1;
+    const birthDay = selectedDate.getDate();
+    const resultData = cakeWordsData.find(item =>
+      Number(item.month) === birthMonth && Number(item.day) === birthDay
+    );
+
+	    if (!resultData) {
+	      resultArea.innerHTML = `<p>該当するデータが見つかりませんでした。</p>`;
+	      resultArea.classList.add('show');
+	      return;
+	    }
+
+	    resultArea.innerHTML = `
+	      <p>${birthMonth}月${birthDay}日生まれのあなたへ</p>
+	      <h2>${resultData.cakeName}</h2>
+	      <p class="cake-word">「${resultData.cakeWord}」</p>
+	      <p>${resultData.description}</p>
+	    `;
+    resultArea.classList.add('show');
+  }
+
+  prevMonthBtn.addEventListener('click', () => {
+    currentMonth--;
+    if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear--;
+    }
+    renderCalendar();
+  });
+
+  nextMonthBtn.addEventListener('click', () => {
+    currentMonth++;
+    if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear++;
+    }
+    renderCalendar();
+  });
+  submitButton.addEventListener('click', showResult);
+
+  updateInputValue();
+  renderWeekdays();
+  renderCalendar();
 })();
 </script>
 

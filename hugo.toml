@@ -3,6 +3,10 @@ languageCode = "ja-jp"
 title = "あなたのケーキ言葉占い"
 assetDir = "assets"
 enableRobotsTXT = true
+disableKinds = ["taxonomy", "term"]
+
+[params]
+  description = "誕生日や記念日から365日のケーキ言葉を探せる占いサイト。世界の定番ケーキや珍しい地域菓子に込めたメッセージを紹介します。"
 
 [sitemap]
   changefreq = "weekly"

@@ -1,4 +1,63 @@
+{{- $description := .Site.Params.description -}}
+{{- with .Params.description }}{{ $description = . }}{{ end -}}
+{{- $canonical := .Permalink -}}
+{{- $siteName := .Site.Title -}}
+{{- $ogImage := resources.Get "images/reinbow_cake.png" -}}
+
 <title>{{ .Title }}</title>
-<meta name="description" content="{{ with .Params.description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+<meta name="description" content="{{ $description }}">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<link rel="canonical" href="{{ $canonical }}">
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:site_name" content="{{ $siteName }}">
 <meta property="og:title" content="{{ .Title }}">
-<meta property="og:description" content="{{ with .Params.description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+<meta property="og:description" content="{{ $description }}">
+<meta property="og:url" content="{{ $canonical }}">
+{{- with $ogImage }}
+<meta property="og:image" content="{{ .Permalink }}">
+<meta property="og:image:width" content="{{ .Width }}">
+<meta property="og:image:height" content="{{ .Height }}">
+<meta property="og:image:alt" content="虹色のケーキのイラスト">
+{{- end }}
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ .Title }}">
+<meta name="twitter:description" content="{{ $description }}">
+{{- with $ogImage }}
+<meta name="twitter:image" content="{{ .Permalink }}">
+<meta name="twitter:image:alt" content="虹色のケーキのイラスト">
+{{- end }}
+
+{{- if .IsHome }}
+  {{- $website := dict
+    "@context" "https://schema.org"
+    "@type" "WebSite"
+    "name" $siteName
+    "url" .Site.Home.Permalink
+    "description" $description
+    "inLanguage" "ja-JP"
+  -}}
+<script type="application/ld+json">{{ $website | jsonify | safeJS }}</script>
+{{- else }}
+  {{- $webpage := dict
+    "@context" "https://schema.org"
+    "@type" "CollectionPage"
+    "name" .Title
+    "url" $canonical
+    "description" $description
+    "inLanguage" "ja-JP"
+    "isPartOf" (dict "@type" "WebSite" "name" $siteName "url" .Site.Home.Permalink)
+  -}}
+  {{- $breadcrumb := dict
+    "@context" "https://schema.org"
+    "@type" "BreadcrumbList"
+    "itemListElement" (slice
+      (dict "@type" "ListItem" "position" 1 "name" $siteName "item" .Site.Home.Permalink)
+      (dict "@type" "ListItem" "position" 2 "name" .Title "item" $canonical)
+    )
+  -}}
+<script type="application/ld+json">{{ $webpage | jsonify | safeJS }}</script>
+<script type="application/ld+json">{{ $breadcrumb | jsonify | safeJS }}</script>
+{{- end }}

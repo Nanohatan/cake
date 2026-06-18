@@ -1,5 +1,9 @@
 {{ define "main" }}
 <div class="container">
+  <header class="my-5">
+    <h1 style="font-family: 'Mochiy Pop One', sans-serif; color: #d47d9c;">ケーキ言葉一覧</h1>
+    <p>365日のケーキと、それぞれに込めたケーキ言葉を日付順に紹介します。</p>
+  </header>
  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
     {{ range sort .Site.Data.cakeWords "month" "day"  }}
 

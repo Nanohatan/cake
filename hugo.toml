@@ -1,4 +1,4 @@
-baseURL = 'https://cake-8gr.pages.dev/'
+baseURL = 'https://cake.dr-strangelove.com/'
 languageCode = "ja-jp"
 title = "あなたのケーキ言葉占い"
 assetDir = "assets"
